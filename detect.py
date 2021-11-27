@@ -76,7 +76,7 @@ def run(weights: str, img_path: str, project='runs/detect',  conf_thres=0.25, io
 def parse_opt():
     parser = argparse.ArgumentParser()
     parser.add_argument('--weights', nargs='+', type=str, default='runs/train/best.pt')
-    parser.add_argument('--img_path', type=str, default='/tmp/move.mp4')
+    parser.add_argument('--img_path', type=str, default='')
     parser.add_argument('--project', default='runs/detect')
     opt = parser.parse_args()
     return opt
