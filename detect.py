@@ -62,7 +62,11 @@ def run(weights: str, img_path: str, project='runs/detect',  conf_thres=0.25, io
             if save_path:
                 if isinstance(vid_writer[i], cv2.VideoWriter):
                     vid_writer[i].release()
-                if vid_cap:  # video
+                if not vid_cap:
+                    cv2.imshow('result', img0)
+                    cv2.waitKey(0)
+                    return
+                else:  # video
                     fps = vid_cap.get(cv2.CAP_PROP_FPS)
                     w = int(vid_cap.get(cv2.CAP_PROP_FRAME_WIDTH))
                     h = int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -75,8 +79,8 @@ def run(weights: str, img_path: str, project='runs/detect',  conf_thres=0.25, io
 
 def parse_opt():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--weights', nargs='+', type=str, default='runs/train/best.pt')
-    parser.add_argument('--img_path', type=str, default='')
+    parser.add_argument('--weights', nargs='+', type=str, default='runs/best.pt')
+    parser.add_argument('--img_path', type=str, default='/home/lee/Work/data/image/image14.jpg')
     parser.add_argument('--project', default='runs/detect')
     opt = parser.parse_args()
     return opt
