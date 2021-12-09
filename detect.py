@@ -32,13 +32,13 @@ def run(weights: str, img_path: str, project='runs/detect',  conf_thres=0.25, io
             s += f'{i}: '
             p, frame = path, getattr(dataset, 'frame', 0)
             p = Path(p)
-            save_path = str(save_dir / p.name)
+            save_path = str(save_dir)
             s += '%gx%g ' % img.shape[2:]
             gn = torch.tensor(img0.shape)[[1, 0, 1, 0]]
 
             if len(det):
                 det[:, :4] = scale_coords(img.shape[2:], det[:, :4], img0.shape).round()
-
+                count = 0
                 for c in det[:, -1].unique():
                     n = (det[:, -1] == c).sum()
                     s += f"{n} {names}{'s' * (n > 1)}, "
@@ -50,11 +50,15 @@ def run(weights: str, img_path: str, project='runs/detect',  conf_thres=0.25, io
                     aim = aim.split(' ')
                     aims.append(aim)
                     c = int(cls)  # integer class
-                    label = f'{names} {conf:.2f}'
-                    # annotator.box_label(xyxy, label)
+                    label = f'{names}{conf:.1f}'
                     p1, p2, mid = (int(xyxy[0]), int(xyxy[1])), (int(xyxy[2]), int(xyxy[3])), (int(xyxy[0])//2 + int(xyxy[2])//2, int(xyxy[1])//2 + int(xyxy[3])//2)
                     move_points.add(mid)
                     cv2.rectangle(img0, p1, p2, (255, 0, 0), thickness=max(round(sum(img0.shape) / 2 * 0.003), 2), lineType=cv2.LINE_AA)
+                    cv2.putText(img0, label, p1, cv2.FONT_HERSHEY_DUPLEX,
+                                thickness=max(round(sum(img0.shape) / 2 * 0.003), 2), color=(255, 0, 0), fontScale=0.7)
+                    cv2.putText(img0, str(count), (int(xyxy[0]), int(xyxy[3])), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 255))
+                    cv2.putText(img0, str(len(det)), (20, 30), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 255))
+                    count += 1
 
             for point in move_points:
                 cv2.circle(img0, point, radius=1, color=(0, 0, 255), thickness=3)
@@ -64,17 +68,16 @@ def run(weights: str, img_path: str, project='runs/detect',  conf_thres=0.25, io
                     vid_writer[i].release()
                 if not vid_cap:
                     cv2.imshow('result', img0)
-                    cv2.waitKey(0)
+                    if cv2.waitKey(0) & 0xFF == ord('q'):
+                        break
                     return
                 else:  # video
                     fps = vid_cap.get(cv2.CAP_PROP_FPS)
                     w = int(vid_cap.get(cv2.CAP_PROP_FRAME_WIDTH))
                     h = int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-                vid_writer[i] = cv2.VideoWriter(save_path, cv2.VideoWriter_fourcc(*'mp4v'), fps, (w, h))
+                vid_writer[i] = cv2.VideoWriter(f'{save_path}/{p}.mp4', cv2.VideoWriter_fourcc(*'mp4v'), fps, (w, h))
+                vid_writer[i].write(img0)
                 print(f'save in {save_path}')
-            cv2.imshow('result', img0)
-            cv2.waitKey(1)
-            vid_writer[i].write(img0)
 
 
 def parse_opt():
