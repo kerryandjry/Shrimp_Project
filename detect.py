@@ -64,20 +64,20 @@ def run(weights: str, img_path: str, project='runs/detect',  conf_thres=0.25, io
                 cv2.circle(img0, point, radius=1, color=(0, 0, 255), thickness=3)
 
             if save_path:
-                if isinstance(vid_writer[i], cv2.VideoWriter):
-                    vid_writer[i].release()
                 if not vid_cap:
                     cv2.imshow('result', img0)
                     if cv2.waitKey(0) & 0xFF == ord('q'):
                         break
                     return
+                if isinstance(vid_writer[i], cv2.VideoWriter):
+                    vid_writer[i].release()
                 else:  # video
                     fps = vid_cap.get(cv2.CAP_PROP_FPS)
                     w = int(vid_cap.get(cv2.CAP_PROP_FRAME_WIDTH))
                     h = int(vid_cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
                 vid_writer[i] = cv2.VideoWriter(f'{save_path}/{p}.mp4', cv2.VideoWriter_fourcc(*'mp4v'), fps, (w, h))
-                vid_writer[i].write(img0)
-                print(f'save in {save_path}')
+            vid_writer[i].write(img0)
+            print(f'save image')
 
 
 def parse_opt():
