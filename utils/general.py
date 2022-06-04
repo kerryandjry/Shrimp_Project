@@ -49,7 +49,7 @@ def set_logging(name=None, verbose=True):
     return logging.getLogger(name)
 
 
-LOGGER = set_logging(__name__)  # define globally (used in train.py, val.py, detect.py, etc.)
+LOGGER = set_logging(__name__)  # define globally (used in train.py, val.py, detect2.py, etc.)
 
 
 class Profile(contextlib.ContextDecorator):
@@ -729,7 +729,7 @@ def non_max_suppression(prediction, conf_thres=0.25, iou_thres=0.45, classes=Non
     return output
 
 
-def strip_optimizer(f='best.pt', s=''):  # from utils.general import *; strip_optimizer()
+def strip_optimizer(f='mask.pt', s=''):  # from utils.general import *; strip_optimizer()
     # Strip optimizer from 'f' to finalize training, optionally save as 's'
     x = torch.load(f, map_location=torch.device('cpu'))
     if x.get('ema'):
