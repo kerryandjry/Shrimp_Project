@@ -32,12 +32,11 @@ def run(weights: str, img_path: str, project: str, conf_thres=0.25, iou_thres=0.
         pred = non_max_suppression(pred, conf_thres, iou_thres, agnostic_nms)
         print("===================")
         shrimp_num_current_frame = len(*pred)
-        shrimp_num = shrimp_num_current_frame
-        # if shrimp_num_last_frame < shrimp_num_current_frame:
-        #     shrimp_num = shrimp_num + (shrimp_num_current_frame - shrimp_num_last_frame)
-        #     shrimp_num_last_frame = shrimp_num_current_frame
-        # elif shrimp_num_last_frame > shrimp_num_current_frame:
-        #     shrimp_num_last_frame = shrimp_num_current_frame
+        if shrimp_num_last_frame < shrimp_num_current_frame:
+            shrimp_num = shrimp_num + (shrimp_num_current_frame - shrimp_num_last_frame)
+            shrimp_num_last_frame = shrimp_num_current_frame
+        elif shrimp_num_last_frame > shrimp_num_current_frame:
+            shrimp_num_last_frame = shrimp_num_current_frame
 
         for i, det in enumerate(pred):
             aims = list()
@@ -51,7 +50,7 @@ def run(weights: str, img_path: str, project: str, conf_thres=0.25, iou_thres=0.
             if len(det):
                 det[:, :4] = scale_coords(img.shape[2:], det[:, :4], img0.shape).round()
                 num_of_shrimp = f'TOTAL = {str(shrimp_num)}'
-                cv2.putText(img0, num_of_shrimp, (700, 50), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 255))
+                cv2.putText(img0, num_of_shrimp, (500, 50), cv2.FONT_HERSHEY_DUPLEX, 1, (0, 0, 255))
                 for c in det[:, -1].unique():
                     n = (det[:, -1] == c).sum()
                     s += f"{n} {names}{'s' * (n > 1)}, "
@@ -92,8 +91,9 @@ def run(weights: str, img_path: str, project: str, conf_thres=0.25, iou_thres=0.
 
 def parse_opt():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--weights', nargs='+', type=str, default='runs/train/best.pt')
-    parser.add_argument('--img_path', type=str, default=r'')
+    parser.add_argument('--weights', nargs='+', type=str, default='runs/new/best.pt')
+    parser.add_argument('--img_path', type=str, default=r'/home/lee/Work/data/shrimp_video_new/2022-03-12-10_13_25.mp4')
+
     parser.add_argument('--project', default='runs/detect')
     opt = parser.parse_args()
     return opt
